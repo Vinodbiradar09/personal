@@ -560,7 +560,7 @@ const BlogListPage = ({
         </div>
 
         <footer className="text-center text-sm text-[#b4a590] pt-16 mt-16 border-t border-[#3a3a3a]">
-          © 2025 Vinod. Built with NextJs, Typescript, and Claude ☕
+          © 2025 Vinod. Built with NextJs, Typescript, and Claude 🌸
         </footer>
       </div>
     </div>
@@ -659,7 +659,7 @@ const BlogPostPage = ({
         </article>
 
         <footer className="text-center text-sm text-[#b4a590] pt-16 mt-16 border-t border-[#3a3a3a]">
-          © 2025 Vinod. Built with NextJs, Typescript, and Claude ☕
+          © 2025 Vinod. Built with NextJs, Typescript, and Claude 🌸
         </footer>
       </div>
     </div>
