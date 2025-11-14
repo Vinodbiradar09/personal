@@ -379,6 +379,140 @@ So to summarize: code changes trigger CI pipelines that test and validate. When 
 
 Is this understanding correct? I'm always learning and improving my DevOps knowledge, so I'd love to hear your thoughts on this workflow!`,
   },
+  {
+    id: "websockets-backend-communication",
+    title: "WebSockets and Advanced Backend Communication",
+    excerpt:
+      "How production systems use message queues, pub/sub, and WebSockets to build scalable microservices that don't fall apart under pressure.",
+    date: "March 2025",
+    readTime: "18 min read",
+    content: `Let me tell you about something that blew my mind when I first learned it: in production applications, we don't just have one big backend doing everything. We break our backend into multiple services, and these services talk to each other in fascinating ways.
+
+The PhonePe Problem
+
+Let's start with a real example. Imagine I'm sending 200 rupees to my friend Shambavi through PhonePe. The money transfer needs to happen immediately - that's the core MVP, right? But PhonePe also sends notifications and SMS confirmations.
+
+Here's where things get tricky. If we build everything in one backend and the SMS service goes down, suddenly our entire payment system is affected. Users can't send money because we're waiting for the SMS service to respond. That's a terrible user experience.
+
+The notification service being down shouldn't stop people from sending money. That's where microservices architecture comes in.
+
+Enter Message Queues
+
+When a request comes in, it reaches our primary backend. The money deduction and addition happens immediately - that's synchronous and critical. But for services like SMS and notifications? We use a queue.
+
+Think of a queue like a todo list. Our primary backend says "hey, I need to send an SMS to this user" and puts that job in the queue. Then it moves on. It doesn't wait. A separate worker service picks up jobs from the queue and handles them one by one.
+
+The beauty? Money transfers happen instantly. Notifications can take their own time. If the notification worker crashes, users can still send money.
+
+The LeetCode Architecture
+
+Here's another great example: LeetCode. When Shambavi (let's say she's really good at coding) submits her C++ solution, here's what happens:
+
+1. The request hits LeetCode's primary backend
+2. The backend (producer) puts a job in a queue with: userId, problemId, code, language
+3. A worker picks up the job and executes the code
+
+Why not execute code in the primary backend? Two reasons:
+
+First, we're running untrusted user code. What if someone writes system("rm -rf /") or system("ls")? They could read our entire filesystem. That's a security nightmare.
+
+Second, what if the code has while(true)? Our primary backend would be stuck, and other users would suffer.
+
+So workers run in isolated containers. They're sandboxed. They execute the code safely, and if something goes wrong, we just kill that worker. The main backend is fine.
+
+Types of Communication
+
+Let me break down how backends actually talk to each other:
+
+Synchronous Communication
+
+HTTP/HTTPS: When one service makes an HTTP request to another, it waits for a response. This is the classic three-way handshake from computer networks. Service A sends a request, Service B acknowledges it, and A confirms. A waits until B responds - that's synchronous.
+
+WebSockets: This is interesting. WebSockets start as HTTP requests, then upgrade to WebSocket connections. They allow full-duplex communication - both server and client can send messages anytime without reopening connections. Unlike HTTP, where the connection closes after each response, WebSockets stay open.
+
+Asynchronous Communication
+
+Message Queues (Redis, RabbitMQ): A producer adds jobs to a queue, and consumers pick them up whenever they're ready. The producer doesn't wait - that's what makes it asynchronous.
+
+Pub/Sub: Publishers send messages, and all subscribers receive them. Great for scaling multiple services.
+
+The Full LeetCode Flow
+
+Let me paint the complete picture:
+
+1. Shambavi submits code
+2. Primary backend puts job in queue
+3. Worker picks the job and executes code in isolated container
+4. Worker gets result (Accepted/TLE/Wrong Answer)
+5. Worker publishes result to pub/sub
+6. WebSocket server subscribed to pub/sub receives the result
+7. WebSocket server sends event to Shambavi's browser
+
+"Wait," you're thinking, "why do we need pub/sub? Why can't the worker directly talk to the browser?"
+
+Why Workers Can't Talk to Browsers Directly
+
+Three main reasons:
+
+Workers are untrusted and isolated: They execute user code. They should never have direct access to clients. They should only talk to internal systems.
+
+Workers are short-lived: They scale up and down. A worker might execute code and die before sending the result to the frontend. If workers connected directly to browsers, we'd lose messages when workers crash.
+
+Security: Workers shouldn't know about external connections at all. They should be completely isolated from the outside world.
+
+What If Things Go Down?
+
+Primary backend is down: We tell users "servers are down, try again later." There's no way around this.
+
+Queue is down: The primary backend retries adding jobs. If the queue crashes with jobs in it, those jobs might be lost. But queues rarely go down, and they have persistence strategies.
+
+How Redis Handles Crashes
+
+Redis has two strategies:
+
+AOF (Append Only File): Every write operation (LPUSH, RPUSH, HSET) is logged to disk. If Redis crashes, we replay the log file from top to bottom. Downside? Large files take time to replay.
+
+RDB (Redis Database Backup): Redis takes periodic snapshots (like every 900 seconds if at least 1 key changed). It creates a binary file (dump.rdb). Recovery is faster - just load one file. But you might lose data between snapshots.
+
+RabbitMQ writes everything to disk too, with message replication across nodes for reliability.
+
+Workers are down: If a worker picks a job and crashes, the queue doesn't receive an acknowledgment. After a timeout, the job goes back to the queue. A new worker picks it up. If a job keeps failing after multiple tries, we send it to the Dead Letter Queue (DLQ) for investigation.
+
+Scaling WebSocket Servers
+
+In production, we don't have just one WebSocket server. We have many. There are two main scaling strategies:
+
+Sticky Connections (Room-based): Group users by rooms. Like in a game (think Gather.town or PUBG), put all 100 players in one server. This works well for smaller groups.
+
+Downside? If a room has users from USA, India, Japan, and Australia, but the server is in India, non-Indian users experience latency.
+
+Geographic Distribution (Better approach): Deploy WebSocket servers in multiple regions. Indian users connect to Indian servers, US users to US servers, etc.
+
+But here's the challenge: if Vinod (India) and Shambavi (USA) are in the same room but on different servers, how does a message from Vinod reach Shambavi?
+
+Pub/Sub to the Rescue
+
+Instead of workers figuring out which WebSocket server Shambavi is connected to, workers just publish messages to pub/sub. All WebSocket servers subscribe to these messages. Whichever server has Shambavi connected receives the message and forwards it to her.
+
+\`\`\`
+WS1 → Shambavi → USA
+WS2 → Vinod → India  
+WS3 → Bharg → Australia
+WS4 → Rihanna → Russia
+\`\`\`
+
+When Vinod sends a message, it goes to WS2 (India). WS2 publishes to pub/sub. WS1 (USA) picks it up and sends it to Shambavi. That's how we scale globally.
+
+The Big Picture
+
+Modern production systems aren't monoliths. They're distributed systems with:
+- Synchronous communication for critical operations
+- Asynchronous queues for non-critical tasks
+- Pub/sub for scaling across servers
+- WebSockets for real-time communication
+
+Understanding these patterns changed how I think about building applications. Next time you send money on PhonePe or submit code on LeetCode, you'll know exactly what's happening behind the scenes.`,
+  },
 ];
 
 const HomePage = ({ onNavigate }: { onNavigate: (page: string) => void }) => {
