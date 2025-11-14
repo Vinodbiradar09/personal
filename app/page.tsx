@@ -414,7 +414,7 @@ Here's another great example: LeetCode. When Shambavi (let's say she's really go
 
 Why not execute code in the primary backend? Two reasons:
 
-First, we're running untrusted user code. What if someone writes system("rm -rf /") or system("ls")? They could read our entire filesystem. That's a security nightmare.
+First, we're running untrusted user code. What if bad girl shambavi writes system("rm -rf /") or system("ls")? They could read our entire filesystem. That's a security nightmare. by the way shambavi is good girl
 
 Second, what if the code has while(true)? Our primary backend would be stuck, and other users would suffer.
 
