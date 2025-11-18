@@ -27,7 +27,7 @@ const projects: Project[] = [
       "AI-powered leave letter generator with Sonar Pro (Perplexity API) for smart generation, solving the handwriting problem for students.",
     technologies: ["Next.js", "TypeScript", "MongoDB", "NextAuth", "PDFKit"],
     website: "https://betterletterai.vercel.app",
-    source: "https://github.com/Vinodbiradar09/betterletter-ai",
+    source: "https://github.com/Vinodbiradar09/better-letter-ai",
   },
   {
     title: "Contra AI",
@@ -36,7 +36,7 @@ const projects: Project[] = [
       "Full-stack AI text transformation platform with four modes: Humanize, Refine, Concise, and Academics.",
     technologies: ["Next.js", "TypeScript", "MongoDB", "Sonar Pro"],
     website: "https://contra-ai.vercel.app",
-    source: "https://github.com/Vinodbiradar09/contra-ai",
+    source: "https://github.com/Vinodbiradar09/ContraAI",
   },
   {
     title: "Anon Message",
