@@ -21,22 +21,22 @@ interface BlogPost {
 
 const projects: Project[] = [
   {
-    title: "BetterLetter AI",
-    year: "2025",
-    description:
-      "AI-powered leave letter generator with Sonar Pro (Perplexity API) for smart generation, solving the handwriting problem for students.",
-    technologies: ["Next.js", "TypeScript", "MongoDB", "NextAuth", "PDFKit"],
-    website: "https://betterletterai.vercel.app",
-    source: "https://github.com/Vinodbiradar09/better-letter-ai",
-  },
-  {
-    title: "Contra AI",
+    title: "ContraAI",
     year: "2025",
     description:
       "Full-stack AI text transformation platform with four modes: Humanize, Refine, Concise, and Academics.",
     technologies: ["Next.js", "TypeScript", "MongoDB", "Sonar Pro"],
     website: "https://contra-ai.vercel.app",
     source: "https://github.com/Vinodbiradar09/ContraAI",
+  },
+  {
+    title: "NeetCode",
+    year: "2025",
+    description:
+      "NeetCode is designed for long coding sessions. Practice high-quality problems, compete with peers, create your own problems and learn efficiently with our curated platform.",
+    technologies: ["Next.js", "TypeScript", "Postgresql", "Node.js" , "Docker" , "RabbitMQ" , "Redis" , "Pubs/Subs"],
+    website:"https://github.com/Vinodbiradar09/NeetCode",
+    source: "https://github.com/Vinodbiradar09/NeetCode",
   },
   {
     title: "Anon Message",
@@ -47,6 +47,24 @@ const projects: Project[] = [
     website: "https://anonymous-messages-vin.vercel.app",
     source: "https://github.com/Vinodbiradar09/anonymous-msg",
   },
+  {
+    title: "BetterLetterAI",
+    year: "2025",
+    description:
+      "AI-powered leave letter generator with Sonar Pro (Perplexity API) for smart generation, solving the handwriting problem for students.",
+    technologies: ["Next.js", "TypeScript", "MongoDB", "NextAuth", "PDFKit"],
+    website: "https://betterletterai.vercel.app",
+    source: "https://github.com/Vinodbiradar09/better-letter-ai",
+  },
+  {
+    title: "Zero",
+    year: "2025",
+    description:
+      "Zero is a minimalistic, AI-powered email client that empowers you to manage your email with ease",
+    technologies: ["Next.js", "TypeScript", "Node.js", "Postgresql", "Clerk", "Gemini" , "Aurinko"],
+    website: "https://zero-vin.vercel.app",
+    source: "https://github.com/Vinodbiradar09/zero",
+  },
 ];
 
 const skills: string[] = [
@@ -56,7 +74,6 @@ const skills: string[] = [
   "TypeScript",
   "Node.js",
   "Express.js",
-  "C++",
   "Rust",
   "PostgreSQL",
   "MongoDB",
